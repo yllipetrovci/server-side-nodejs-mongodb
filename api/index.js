@@ -10,6 +10,10 @@ const { buildSchema } = require('graphql');
 
 const PORT = 3000;
 
+//temporary use 
+const events = [];
+
+//Temporary commeted
 // connect to Mongo daemon
 // mongoose.connect(
 //     'mongodb://localhost:27017/admin',
@@ -56,7 +60,6 @@ app.use('/graphql',
             title: String!
             description: String!
             price: Float!
-            date: String!
         }
 
         type RootMutation {
@@ -70,11 +73,18 @@ app.use('/graphql',
     `),
         rootValue: {
             events: () => {
-                return ['Event1', 'Event2', 'Event3']
+                return events;
             },
             createEvent: (args) => {
-                const eventName = args.name;
-                return eventName;
+                const event = {
+                    _id: Math.random().toString(),
+                    title: args.eventInput.title,
+                    description: args.eventInput.description,
+                    price: +args.eventInput.price, // + converts to float 
+                    date: new Date().toISOString()
+                }
+                events.push(event);
+                return event;
             }
         },
         graphiql: true
