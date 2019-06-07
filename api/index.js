@@ -5,6 +5,9 @@ const app = express();
 const cors = require('cors');
 const route = require('./routes/userRoute');
 
+const graphqlHttp = require('express-graphql');
+const { buildSchema } = require('graphql');
+
 const PORT = 3000;
 
 // connect to Mongo daemon
@@ -20,12 +23,41 @@ app.use(cors());
 
 app.use(bodyparser.json());
 
+app.use('/graphql',
+    graphqlHttp({
+        schema: buildSchema(`
+        type RootQuery {
+            events: [String!]!
+        }
+
+        type RootMutation {
+            createEvent(name: String): String
+        }
+
+        schema{
+            query: RootQuery
+            mutation: RootMutation
+        }
+    `),
+        rootValue: {
+            events: () => {
+                return ['Event1', 'Event2', 'Event3']
+            },
+            createEvent: (args) => {
+                const eventName = args.name;
+                return eventName;
+            }
+        },
+        graphiql: true
+    })
+);
+
 app.use('/api', route);
 
-app.get('/', function(req,res){
+app.get('/', function (req, res) {
     res.send('Hello world');
 });
 
-app.listen(PORT, ()=>{
-    console.log('Server has been started at PORT '+PORT );
+app.listen(PORT, () => {
+    console.log('Server has been started at PORT ' + PORT);
 })
