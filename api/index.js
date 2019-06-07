@@ -23,15 +23,44 @@ app.use(cors());
 
 app.use(bodyparser.json());
 
+/* 
+###################################################################################################
+# A brief Explanation about graphql                                                               #
+# 1. Graphql has some kind of queries like                                                        #
+#       -Query in RESTful api means a GET request                                                 #
+#       -Mutation in RESTful api means on of these request type (POST, PATCH, DELETE, UPDATE)     #                          # 
+# 2. Graphql works with types, you can create your own event type as it is e.g under build        # 
+# schema line.                                                                                    #
+#  the "!"" sign means that the specific filed are required and can not be null                   #
+# 3. You can create input instead of writing long queries, you can separate it                    #
+#                                                                                                 #
+###################################################################################################  
+*/
+
 app.use('/graphql',
     graphqlHttp({
         schema: buildSchema(`
+        type Event {
+            _id: ID!
+            title: String!
+            description: String!
+            price: Float
+            date: String! 
+        }
+
         type RootQuery {
-            events: [String!]!
+            events: [Event!]!
+        }
+        
+        input EventInput {
+            title: String!
+            description: String!
+            price: Float!
+            date: String!
         }
 
         type RootMutation {
-            createEvent(name: String): String
+            createEvent(eventInput: EventInput): Event
         }
 
         schema{
