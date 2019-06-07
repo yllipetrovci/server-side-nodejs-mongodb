@@ -13,16 +13,6 @@ const PORT = 3000;
 //temporary use 
 const events = [];
 
-//Temporary commeted
-// connect to Mongo daemon
-// mongoose.connect(
-//     'mongodb://localhost:27017/admin',
-//     { useNewUrlParser: true }
-//   )
-//   .then(() => console.log('MongoDB Connected'))
-//   .catch(err => console.log(err));
-
-
 app.use(cors());
 
 app.use(bodyparser.json());
@@ -97,6 +87,15 @@ app.get('/', function (req, res) {
     res.send('Hello world');
 });
 
-app.listen(PORT, () => {
-    console.log('Server has been started at PORT ' + PORT);
-})
+mongoose.connect(
+    `${process.env.API_URL}`,
+    { useNewUrlParser: true }
+)
+    .then(() => {
+        console.log('MongoDB Connected: ' + process.env.API_URL)
+        app.listen(PORT, () => {
+            console.log('Server has been started at PORT ' + PORT);
+        })
+    })
+    .catch(err => console.log(err));
+
