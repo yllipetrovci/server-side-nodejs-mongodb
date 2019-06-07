@@ -11,7 +11,7 @@ const { buildSchema } = require('graphql');
 const PORT = 3000;
 
 //temporary use 
-const events = [];
+const Event = require('./models/event');
 
 app.use(cors());
 
@@ -66,15 +66,20 @@ app.use('/graphql',
                 return events;
             },
             createEvent: (args) => {
-                const event = {
-                    _id: Math.random().toString(),
+                const event = new Event({
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: +args.eventInput.price, // + converts to float 
                     date: new Date().toISOString()
-                }
-                events.push(event);
-                return event;
+                });
+
+                return event.save().then(result => {
+                    console.log(result);
+                    return { ...result._doc };
+                }).catch(err => {
+                    console.log(err);
+                    throw err;
+                });
             }
         },
         graphiql: true
