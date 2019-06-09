@@ -42,6 +42,7 @@ app.use('/graphql',
             description: String!
             price: Float
             date: String! 
+            creator: String
         }
 
         type User{
@@ -100,12 +101,22 @@ app.use('/graphql',
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: +args.eventInput.price, // + converts to float 
+                    creator: '5cfd88224b584123a68e6dca',
                     date: new Date().toISOString()
                 });
 
+                let createdEvent;
+
                 return event.save().then(result => {
-                    console.log(result);
-                    return { ...result._doc };
+                    createdEvent = { ...result._doc };
+                    return User.findById('5cfd88224b584123a68e6dca')
+                }).then(user => {
+                    if (!user) throw new Error('User not found!');
+
+                    user.createdEvents.push(event);
+                    return user.save();
+                }).then(result => {
+                    return createdEvent;
                 }).catch(err => {
                     console.log(err);
                     throw err;
