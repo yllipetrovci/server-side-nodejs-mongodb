@@ -104,22 +104,29 @@ app.use('/graphql',
                 });
             },
             createUser: (args) => {
-                //first argument its password, second argument its salting round
-                return bcrypt.hash(args.userInput.password, 12).then((hashedPassword => {
-                    const user = new User({
-                        email: args.userInput.email,
-                        password: hashedPassword
+                return User.findOne({ email: args.userInput.email }).then(user => {
+                    //if a user exists with a same email address than throw an error
+                    if (user) throw new Error("User exists already.");
+
+                    return bcrypt.hash(args.userInput.password, 12).then((hashedPassword => {
+                        const user = new User({
+                            email: args.userInput.email,
+                            password: hashedPassword
+                        })
+
+                        return user.save();
+
+                    })).then(result => {
+                        return { ...result._doc, _id: result.id };
+                    }
+
+                    ).catch(err => {
+                        throw err;
                     })
 
-                    return user.save();
-
-                })).then(result => {
-                    return { ...result._doc, _id:result.id };
-                }
-
-                ).catch(err => {
-                    throw err;
                 })
+                //first argument its password, second argument its salting round
+
             }
         },
         graphiql: true
