@@ -57,6 +57,7 @@ app.use('/graphql',
 
         type RootQuery {
             events: [Event!]!
+            users: [User!]!
         }
         
         input EventInput {
@@ -86,6 +87,13 @@ app.use('/graphql',
                     throw err;
                 });
 
+            },
+            users: () => {
+                return User.find().then(users => {
+                    return users.map(user => {
+                        return { ...user._doc }
+                    })
+                })
             },
             createEvent: (args) => {
                 const event = new Event({
