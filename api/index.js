@@ -108,7 +108,7 @@ app.use('/graphql',
                 return bcrypt.hash(args.userInput.password, 12).then((hashedPassword => {
                     const user = new User({
                         email: args.userInput.email,
-                        password: args.userInput.password
+                        password: hashedPassword
                     })
 
                     return user.save();
