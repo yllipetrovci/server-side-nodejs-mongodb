@@ -3,7 +3,8 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const app = express();
 const cors = require('cors');
-const route = require('./routes/userRoute');
+// const route = require('./routes/userRoute');
+const bcrypt
 
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
@@ -113,7 +114,7 @@ app.use('/graphql',
     })
 );
 
-app.use('/api', route);
+// app.use('/api', route);
 
 app.get('/', function (req, res) {
     res.send('Hello world');
