@@ -4,7 +4,7 @@ const bodyparser = require('body-parser');
 const app = express();
 const cors = require('cors');
 // const route = require('./routes/userRoute');
-const bcrypt
+const bcrypt = require('bcryptjs');
 
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
@@ -103,7 +103,7 @@ app.use('/graphql',
                     throw err;
                 });
             },
-            createUser: (args)=>{
+            createUser: (args) => {
                 const user = new User({
                     email: args.userInput.email,
                     password: args.userInput.password
