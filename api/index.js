@@ -12,6 +12,7 @@ const PORT = 3000;
 
 //temporary use 
 const Event = require('./models/event');
+const User = require('./models/user');
 
 app.use(cors());
 
@@ -65,6 +66,7 @@ app.use('/graphql',
 
         type RootMutation {
             createEvent(eventInput: EventInput): Event
+            createUser(userInput: UserInput) : User
         }
 
         schema{
@@ -99,6 +101,12 @@ app.use('/graphql',
                     console.log(err);
                     throw err;
                 });
+            },
+            createUser: (args)=>{
+                const user = new User({
+                    email: args.userInput.email,
+                    password: args.userInput.password
+                })
             }
         },
         graphiql: true
