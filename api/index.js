@@ -104,9 +104,21 @@ app.use('/graphql',
                 });
             },
             createUser: (args) => {
-                const user = new User({
-                    email: args.userInput.email,
-                    password: args.userInput.password
+                //first argument its password, second argument its salting round
+                return bcrypt.hash(args.userInput.password, 12).then((hashedPassword => {
+                    const user = new User({
+                        email: args.userInput.email,
+                        password: args.userInput.password
+                    })
+
+                    return user.save();
+
+                })).then(result => {
+                    return { ...result._doc, _id:result.id };
+                }
+
+                ).catch(err => {
+                    throw err;
                 })
             }
         },
