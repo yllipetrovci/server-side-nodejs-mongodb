@@ -129,15 +129,15 @@ app.use('/graphql',
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: +args.eventInput.price, // + converts to float 
-                    creator: '5cfea1252de55214a99309ae',
+                    creator: '5cfea9e63782651b1ad6b4db',
                     date: new Date().toISOString()
                 });
 
                 let createdEvent;
-
                 return event.save().then(result => {
-                    createdEvent = { ...result._doc };
-                    return User.findById('5cfea1252de55214a99309ae')
+                    // graphql call the functions e.g user and get the result from that function
+                    createdEvent = { ...result._doc, creator: user.bind(this, result._doc.creator) };
+                    return User.findById(createdEvent.creator)
                 }).then(user => {
                     if (!user) throw new Error('User not found!');
 
