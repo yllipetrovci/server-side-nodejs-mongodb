@@ -42,13 +42,14 @@ app.use('/graphql',
             description: String!
             price: Float
             date: String! 
-            creator: String
+            creator: User!
         }
 
         type User{
             _id: ID!
             email: String!
             password: String!
+            createdEvents: [Event!]
         }
 
         input UserInput{
@@ -79,7 +80,7 @@ app.use('/graphql',
     `),
         rootValue: {
             events: () => {
-                return Event.find().then(events => {
+                return Event.find().populate('creator').then(events => {
                     return events.map(event => {
                         return { ...event._doc };
                     });
@@ -101,7 +102,7 @@ app.use('/graphql',
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: +args.eventInput.price, // + converts to float 
-                    creator: '5cfd88224b584123a68e6dca',
+                    creator: '5cfea1252de55214a99309ae',
                     date: new Date().toISOString()
                 });
 
