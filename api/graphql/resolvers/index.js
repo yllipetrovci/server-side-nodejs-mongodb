@@ -79,7 +79,7 @@ module.exports =
                 const user = await User.findById(createdEvent.creator)
 
                 if (!user) throw new Error('User not found!');
-                
+
                 user.createdEvents.push(event);
                 await user.save();
                 return createdEvent;
@@ -87,29 +87,25 @@ module.exports =
                 throw err;
             }
         },
-        createUser: (args) => {
-            return User.findOne({ email: args.userInput.email }).then(user => {
+        createUser: async (args) => {
+            try {
+                const userResult = await User.findOne({ email: args.userInput.email })
                 //if a user exists with a same email address than throw an error
-                if (user) throw new Error("User exists already.");
+                if (userResult) throw new Error("User exists already.");
 
-                return bcrypt.hash(args.userInput.password, 12).then((hashedPassword => {
-                    const user = new User({
-                        email: args.userInput.email,
-                        password: hashedPassword
-                    })
+                const hashedPassword = await bcrypt.hash(args.userInput.password, 12)
 
-                    return user.save();
-
-                })).then(result => {
-                    return { ...result._doc, _id: result.id };
-                }
-
-                ).catch(err => {
-                    throw err;
+                const user = new User({
+                    email: args.userInput.email,
+                    password: hashedPassword
                 })
 
-            })
-            //first argument its password, second argument its salting round
+                const result = await user.save();
+                return { ...result._doc, _id: result.id };
 
+            } catch (err) {
+                throw err;
+            }
+            //first argument its password, second argument its salting round
         }
     }
