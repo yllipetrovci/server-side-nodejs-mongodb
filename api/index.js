@@ -137,7 +137,7 @@ app.use('/graphql',
 
                 return event.save().then(result => {
                     createdEvent = { ...result._doc };
-                    return User.findById('5cfd88224b584123a68e6dca')
+                    return User.findById('5cfea1252de55214a99309ae')
                 }).then(user => {
                     if (!user) throw new Error('User not found!');
 
