@@ -53,35 +53,39 @@ module.exports =
                 return users.map(user => {
                     return { ...user._doc }
                 })
+
             } catch (err) {
                 throw err;
             }
         },
-        createEvent: (args) => {
-            const event = new Event({
-                title: args.eventInput.title,
-                description: args.eventInput.description,
-                price: +args.eventInput.price, // + converts to float 
-                creator: '5cfea9e63782651b1ad6b4db',
-                date: new Date().toISOString()
-            });
+        createEvent: async (args) => {
+            try {
+                const event = new Event({
+                    title: args.eventInput.title,
+                    description: args.eventInput.description,
+                    price: +args.eventInput.price, // + converts to float 
+                    creator: '5cfec1f3d87c0f2a4215de0e',
+                    date: new Date().toISOString()
+                });
 
-            let createdEvent;
-            return event.save().then(result => {
+                let createdEvent;
+                const result = await event.save()
+
                 // graphql call the functions e.g user and get the result from that function
-                createdEvent = { ...result._doc, creator: user.bind(this, result._doc.creator) };
-                return User.findById(createdEvent.creator)
-            }).then(user => {
-                if (!user) throw new Error('User not found!');
+                createdEvent = {
+                    ...result._doc,
+                    // creator: user.bind(this, result._doc.creator)
+                };
+                const user = await User.findById(createdEvent.creator)
 
+                if (!user) throw new Error('User not found!');
+                
                 user.createdEvents.push(event);
-                return user.save();
-            }).then(result => {
+                await user.save();
                 return createdEvent;
-            }).catch(err => {
-                console.log(err);
+            } catch (err) {
                 throw err;
-            });
+            }
         },
         createUser: (args) => {
             return User.findOne({ email: args.userInput.email }).then(user => {
