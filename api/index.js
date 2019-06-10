@@ -11,9 +11,16 @@ const { buildSchema } = require('graphql');
 
 const PORT = 3000;
 
-//temporary use 
 const Event = require('./models/event');
 const User = require('./models/user');
+
+
+
+const user = userId => {
+    return User.findById(userId).then(user => {
+        return { ...user._doc, _id: user.id };
+    }).catch(err => { throw err })
+}
 
 app.use(cors());
 
@@ -80,14 +87,18 @@ app.use('/graphql',
     `),
         rootValue: {
             events: () => {
-                return Event.find().populate('creator').then(events => {
-                    return events.map(event => {
-                        return { ...event._doc };
+                return Event.find()
+                    // .populate('creator') populate is replaced by method user
+                    .then(events => {
+                        return events.map(event => {
+                            return {
+                                ...event._doc, creator: user.bind(this, event._doc.creator)
+                            };
+                        });
+                    }).catch((err) => {
+                        console.log(err);
+                        throw err;
                     });
-                }).catch((err) => {
-                    console.log(err);
-                    throw err;
-                });
 
             },
             users: () => {
