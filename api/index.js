@@ -11,9 +11,32 @@ const { buildSchema } = require('graphql');
 
 const PORT = 3000;
 
-//temporary use 
 const Event = require('./models/event');
 const User = require('./models/user');
+
+const events = eventIds => {
+    return Event.find({ _id: { $in: eventIds } })
+        .then(events => {
+            return events.map(event => {
+                return {
+                    ...event._doc,
+                    _id: event._id,
+                    creator: user.bind(this, event.creator)
+                }
+            })
+        }
+        ).catch(err => { throw err; })
+}
+
+const user = userId => {
+    return User.findById(userId).then(user => {
+        return {
+            ...user._doc,
+            _id: user.id,
+            createdEvents: events.bind(this, user._doc.createdEvents)
+        };
+    }).catch(err => { throw err })
+}
 
 app.use(cors());
 
@@ -42,13 +65,14 @@ app.use('/graphql',
             description: String!
             price: Float
             date: String! 
-            creator: String
+            creator: User!
         }
 
         type User{
             _id: ID!
             email: String!
             password: String!
+            createdEvents: [Event!]
         }
 
         input UserInput{
@@ -79,14 +103,18 @@ app.use('/graphql',
     `),
         rootValue: {
             events: () => {
-                return Event.find().then(events => {
-                    return events.map(event => {
-                        return { ...event._doc };
+                return Event.find()
+                    // .populate('creator') populate is replaced by method user
+                    .then(events => {
+                        return events.map(event => {
+                            return {
+                                ...event._doc, creator: user.bind(this, event._doc.creator)
+                            };
+                        });
+                    }).catch((err) => {
+                        console.log(err);
+                        throw err;
                     });
-                }).catch((err) => {
-                    console.log(err);
-                    throw err;
-                });
 
             },
             users: () => {
@@ -101,15 +129,15 @@ app.use('/graphql',
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: +args.eventInput.price, // + converts to float 
-                    creator: '5cfd88224b584123a68e6dca',
+                    creator: '5cfea9e63782651b1ad6b4db',
                     date: new Date().toISOString()
                 });
 
                 let createdEvent;
-
                 return event.save().then(result => {
-                    createdEvent = { ...result._doc };
-                    return User.findById('5cfd88224b584123a68e6dca')
+                    // graphql call the functions e.g user and get the result from that function
+                    createdEvent = { ...result._doc, creator: user.bind(this, result._doc.creator) };
+                    return User.findById(createdEvent.creator)
                 }).then(user => {
                     if (!user) throw new Error('User not found!');
 
