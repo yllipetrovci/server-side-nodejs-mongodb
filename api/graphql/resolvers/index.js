@@ -47,12 +47,15 @@ module.exports =
                 throw err;
             }
         },
-        users: () => {
-            return User.find().then(users => {
+        users: async () => {
+            try {
+                const users = await User.find()
                 return users.map(user => {
                     return { ...user._doc }
                 })
-            })
+            } catch (err) {
+                throw err;
+            }
         },
         createEvent: (args) => {
             const event = new Event({
