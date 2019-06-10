@@ -32,22 +32,20 @@ const user = async userId => {
 
 module.exports =
     {
-        events: () => {
-            return Event.find()
+        events: async () => {
+            try {
+                const events = await Event.find()
                 // .populate('creator') populate is replaced by method user
-                .then(events => {
-                    return events.map(event => {
-                        return {
-                            ...event._doc,
-                            date: new Date(event._doc.date).toISOString(),
-                            creator: user.bind(this, event._doc.creator)
-                        };
-                    });
-                }).catch((err) => {
-                    console.log(err);
-                    throw err;
+                return events.map(event => {
+                    return {
+                        ...event._doc,
+                        date: new Date(event._doc.date).toISOString(),
+                        creator: user.bind(this, event._doc.creator)
+                    };
                 });
-
+            } catch (err) {
+                throw err;
+            }
         },
         users: () => {
             return User.find().then(users => {
