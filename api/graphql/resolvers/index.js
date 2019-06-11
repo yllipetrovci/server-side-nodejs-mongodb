@@ -136,6 +136,7 @@ module.exports =
                     ...result._doc,
                     _id: result.id
                 }
+                
             } catch (err) {
                 throw err;
             }
