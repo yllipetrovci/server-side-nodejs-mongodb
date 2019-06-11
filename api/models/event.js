@@ -15,10 +15,10 @@ const eventSchema = new Schema({
         type: Number,
         required: true
     },
-    date: {
-        type: Date,
-        required: true
-    },
+    // date: {
+    //     type: Date,
+    //     required: true
+    // },
     // creator: {
     //     type: Schema.Types.ObjectId,
     //     ref: 'User'
