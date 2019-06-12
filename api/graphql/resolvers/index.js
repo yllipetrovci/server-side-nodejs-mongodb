@@ -80,7 +80,7 @@ module.exports =
                         ...booking._doc,
                         _id: booking.id,
                         user: user.bind(this, booking._doc.user),
-                        event: singleEvent.bind(this,booking._doc.event),
+                        event: singleEvent.bind(this, booking._doc.event),
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     }
@@ -153,6 +153,21 @@ module.exports =
                     createAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 }
+
+            } catch (err) {
+                throw err;
+            }
+        },
+        cancelBooking: async (args) => {
+            try {
+                const booking = await Booking.findById(args.bookingId).populate('event');
+                const event = {
+                    ...booking.event._doc,
+                    _id: booking.event.id,
+                    creator: user.bind(this, booking.event.creator)
+                };
+                await Booking.deleteOne({ _id: args._doc.bookingId });
+                return event;
 
             } catch (err) {
                 throw err;
