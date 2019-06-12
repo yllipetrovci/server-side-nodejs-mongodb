@@ -77,8 +77,8 @@ module.exports =
                         _id: booking.id,
                         user: user.bind(this, booking._doc.user),
                         event: singleEvent.bind(this, booking._doc.event),
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
+                        createdAt: dateToString(booking._doc.createdAt),
+                        updatedAt: dateToString(booking._doc.updatedAt),
                     }
                 })
             } catch (err) {
@@ -143,8 +143,8 @@ module.exports =
                 return {
                     ...result._doc,
                     _id: result.id,
-                    createAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    createdAt: dateToString(booking._doc.createdAt),
+                    updatedAt: dateToString(booking._doc.updatedAt),
                 }
 
             } catch (err) {
