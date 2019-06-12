@@ -3,17 +3,21 @@ const Event = require('../../models/event');
 const User = require('../../models/user');
 const Booking = require('../../models/booking');
 
+const transformEvent = event => {
+    return {
+        ...event._doc,
+        _id: event._id,
+        date: new Date(event._doc.date).toISOString(),
+        creator: user.bind(this, event.creator)
+    }
+};
+
 const events = async eventIds => {
     try {
         const events = await Event.find({ _id: { $in: eventIds } })
         events => {
             return events.map(event => {
-                return {
-                    ...event._doc,
-                    date: new Date(event._doc.date).toISOString(),
-                    _id: event._id,
-                    creator: user.bind(this, event.creator)
-                }
+                return transformEvent(event);
             })
         }
         return events;
@@ -23,11 +27,7 @@ const events = async eventIds => {
 const singleEvent = async eventId => {
     try {
         const event = await Event.findById(eventId);
-        return {
-            ...event._doc,
-            _id: event.id,
-            creator: user.bind(this, event.creator)
-        }
+        return transformEvent(event);
     } catch (err) {
         throw err;
     }
@@ -50,11 +50,7 @@ module.exports =
             try {
                 const events = await Event.find();
                 return events.map(event => {
-                    return {
-                        ...event._doc,
-                        date: new Date(event._doc.date).toISOString(),
-                        creator: user.bind(this, event._doc.creator)
-                    };
+                    return transformEvent(event);
                 });
             } catch (err) {
                 throw err;
@@ -102,10 +98,7 @@ module.exports =
                 const result = await event.save()
 
                 // graphql call the functions e.g user and get the result from that function
-                createdEvent = {
-                    ...result._doc,
-                    // creator: user.bind(this, result._doc.creator)
-                };
+                createdEvent = transformEvent(result);
                 const user = await User.findById(createdEvent.creator)
 
                 if (!user) throw new Error('User not found!');
@@ -160,11 +153,7 @@ module.exports =
         cancelBooking: async (args) => {
             try {
                 const booking = await Booking.findById(args.bookingId).populate('event');
-                const event = {
-                    ...booking.event._doc,
-                    _id: booking.event.id,
-                    creator: user.bind(this, booking.event.creator)
-                };
+                const event = transformEvent(booking.event);
                 await Booking.deleteOne({ _id: args._doc.bookingId });
                 return event;
 
