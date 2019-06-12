@@ -48,8 +48,7 @@ module.exports =
     {
         events: async () => {
             try {
-                const events = await Event.find()
-                // .populate('creator') populate is replaced by method user
+                const events = await Event.find();
                 return events.map(event => {
                     return {
                         ...event._doc,
