@@ -144,12 +144,7 @@ module.exports =
                     event: fetchedEvent
                 })
                 const result = await booking.save();
-                return {
-                    ...result._doc,
-                    _id: result.id,
-                    createdAt: dateToString(booking._doc.createdAt),
-                    updatedAt: dateToString(booking._doc.updatedAt),
-                }
+                return transformBooking(result);
 
             } catch (err) {
                 throw err;
