@@ -6,12 +6,13 @@ const cors = require('cors');
 // const route = require('./routes/userRoute');
 const graphQlSchema = require('./graphql/schema/index');
 const graphQlResolvers = require('./graphql/resolvers/index');
-
 const graphqlHttp = require('express-graphql');
-
+const isAuth = require('./middleware/is-auth');
 const PORT = 3000;
 
 app.use(cors());
+
+app.use(isAuth);
 
 app.use(bodyparser.json());
 
